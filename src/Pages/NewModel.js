@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 import React, { useEffect, useState } from "react";
 import styled, { keyframes } from "styled-components";
+import Loading from "../Components/Loading";
 import store from "../Stores/todoStore";
 
 const NewModel = () => {
@@ -11,12 +12,6 @@ const NewModel = () => {
   const [makerId, setMakerId] = useState("");
   const [makerName, setMakerName] = useState("");
   const [makerAbrv, setMakerAbrv] = useState("");
-
-  // // vehicleMakeAbrv
-  // vehicleMakeName
-  // vehicleModelAbrv
-  // vehicleModelName
-  // vehicleMakeId
 
   async function getData() {
     setLoading(true);
@@ -39,14 +34,16 @@ const NewModel = () => {
         {
           fields: {
             vehicleModelName: modelName,
-            vehicleMakeAbrv: [makerAbrv],
-            vehicleMakeName: [makerName],
-            vehicleModelAbrv: [modelAbrv],
-            vehicleMakeId: [makerId],
+            vehicleMakeAbrv: makerAbrv,
+            vehicleMakeName: makerName,
+            vehicleModelAbrv: modelAbrv,
+            vehicleMakeId: makerId,
           },
         },
       ];
-      console.log(newModel);
+      store.setSubmitModel(newModel);
+      setModelName("");
+      setModelAbrv("");
     }
   }
 
@@ -85,16 +82,17 @@ const NewModel = () => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="loading-container">
-        <div className="text">Loading...</div> <div className="ring"></div>
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
     <Wrapper>
       <h2>Create new vehicle model</h2>
+      {store.vehicleModelError === true ? (
+        <div className="error">There is error in posting data to server</div>
+      ) : (
+        ""
+      )}
       <div className="form-container">
         <form onSubmit={(e) => submitData(e)}>
           <div className="grid-container">
@@ -193,15 +191,6 @@ const NewModel = () => {
   );
 };
 
-const rotate = keyframes`
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-`;
-
 const Wrapper = styled.main`
   max-width: 40rem;
   margin: 0 auto;
@@ -295,34 +284,6 @@ const Wrapper = styled.main`
     border: none;
     justify-self: center;
     margin-top: 1.8rem;
-  }
-
-  .loading-container {
-    position: relative;
-    width: 20rem;
-    height: 20rem;
-    margin: 10rem auto;
-    .ring {
-      width: 100%;
-      height: 100%;
-      border-left: 4px solid var(--color-h);
-      border-radius: 50%;
-      animation: ${rotate} 1s linear infinite;
-    }
-
-    .text {
-      color: var(--color-h);
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      text-align: center;
-      line-height: 20rem;
-      font-weight: 800;
-      font-size: 2rem;
-      text-transform: uppercase;
-    }
   }
 `;
 

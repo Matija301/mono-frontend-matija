@@ -12,10 +12,10 @@ const Navbar = () => {
         <Link to="/" className="link">
           Home
         </Link>
-        <Link to="carModels" className="link">
+        <Link to="/carlist/carModels" className="link">
           List all models
         </Link>
-        <Link to="carMakers" className="link">
+        <Link to="/carlist/carMakers" className="link">
           Car makers
         </Link>
         <Link to="newmodel" className="link">
@@ -29,7 +29,7 @@ const Navbar = () => {
 const Wrapper = styled.nav`
   display: flex;
   padding: 0.8rem 1.2rem;
-  border-bottom: 2px solid #000;
+  box-shadow: 0px 25px 41px rgba(0, 0, 0, 0.07);
 
   h2 {
     font-size: 2.4rem;

@@ -140,7 +140,6 @@ class Todo {
     }, []);
     const vehicleMakeIdList = newList.map((vehicle) => {
       const {
-        id,
         fields: { vehicleMakeName, vehicleMakeId },
       } = vehicle;
       return {
