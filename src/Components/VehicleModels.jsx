@@ -7,7 +7,7 @@ import { MdDelete } from "react-icons/md";
 import Modal from "./Modal";
 import { AiFillCaretLeft, AiFillCaretRight } from "react-icons/ai";
 import Loading from "./Loading";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineArrowRight } from "react-icons/ai";
 
 const VehicleModels = ({ params }) => {
@@ -20,9 +20,9 @@ const VehicleModels = ({ params }) => {
     setDelteModel({ id, vehicleModelName });
     setModal(true);
   }
-
+  const navigate = useNavigate();
   function pageInc() {
-    if (page === store.filteredModelList.length - 1) {
+    if (page >= store.filteredModelList.length - 1) {
       return;
     } else {
       setPage(page + 1);
@@ -38,18 +38,26 @@ const VehicleModels = ({ params }) => {
 
   async function getData() {
     setLoading(true);
-    await store.setLists();
-    store.resetFilter();
-    if (params) {
-      store.filterList("sortMakerName", params);
-    } else {
-      store.filterList();
+    try {
+      await store.setLists();
+      store.resetFilter();
+      if (params) {
+        store.filterList("sortMakerName", params);
+      } else {
+        store.filterList();
+      }
+      setLoading(false);
+    } catch (error) {
+      navigate("../../");
     }
-    setLoading(false);
   }
   useEffect(() => {
     getData();
   }, []);
+
+  useEffect(() => {
+    setPage(0);
+  }, [store.filteredOption]);
 
   async function deleteModelAction(id) {
     setModal(false);
@@ -72,46 +80,78 @@ const VehicleModels = ({ params }) => {
       ) : (
         ""
       )}
-      {params ? (
-        <Link className="link-to" to="../../carlist/carMakers">
-          Go back to vehicle makers! {<AiOutlineArrowRight />}
-        </Link>
-      ) : (
-        ""
-      )}
-      <div className="heading">
+
+      <div className={params ? "heading params" : "heading"}>
         <h2>list of all models:</h2>
+        {params ? (
+          <Link className="link-to" to="../../carlist/carMakers">
+            Go back to vehicle makers! {<AiOutlineArrowRight />}
+          </Link>
+        ) : (
+          ""
+        )}
       </div>
       <div className="maker-list">
         {store.filteredModelList.length > 0 ? (
-          store.filteredModelList[page].map((item) => {
-            const { id, vehicleModelAbrv, vehicleModelName, vehicleMakeId } =
-              item;
-            return (
-              <article key={id} className="car-makers">
-                <p>
-                  Vehicle maker ID: <span>{vehicleMakeId}</span>
-                </p>
-                <p>
-                  Vehicle model name: <span>{vehicleModelName}</span>
-                </p>
-                <p>
-                  Also known as: <span>{vehicleModelAbrv}</span>
-                </p>
-                <div className="icons">
-                  <Link to={`../../editmodel/${id}`} className="edit icon">
-                    <FaEdit />
-                  </Link>
-                  <div
-                    className="delete icon"
-                    onClick={() => openModalDelete(id, vehicleModelName)}
-                  >
-                    <MdDelete />
+          store.filteredModelList[page] ? (
+            store.filteredModelList[page].map((item) => {
+              const { id, vehicleModelAbrv, vehicleModelName, vehicleMakeId } =
+                item;
+              return (
+                <article key={id} className="car-makers">
+                  <p>
+                    Vehicle maker ID: <span>{vehicleMakeId}</span>
+                  </p>
+                  <p>
+                    Vehicle model name: <span>{vehicleModelName}</span>
+                  </p>
+                  <p>
+                    Also known as: <span>{vehicleModelAbrv}</span>
+                  </p>
+                  <div className="icons">
+                    <Link to={`../../editmodel/${id}`} className="edit icon">
+                      <FaEdit />
+                    </Link>
+                    <div
+                      className="delete icon"
+                      onClick={() => openModalDelete(id, vehicleModelName)}
+                    >
+                      <MdDelete />
+                    </div>
                   </div>
-                </div>
-              </article>
-            );
-          })
+                </article>
+              );
+            })
+          ) : (
+            store.filteredModelList[0].map((item) => {
+              const { id, vehicleModelAbrv, vehicleModelName, vehicleMakeId } =
+                item;
+              return (
+                <article key={id} className="car-makers">
+                  <p>
+                    Vehicle maker ID: <span>{vehicleMakeId}</span>
+                  </p>
+                  <p>
+                    Vehicle model name: <span>{vehicleModelName}</span>
+                  </p>
+                  <p>
+                    Also known as: <span>{vehicleModelAbrv}</span>
+                  </p>
+                  <div className="icons">
+                    <Link to={`../../editmodel/${id}`} className="edit icon">
+                      <FaEdit />
+                    </Link>
+                    <div
+                      className="delete icon"
+                      onClick={() => openModalDelete(id, vehicleModelName)}
+                    >
+                      <MdDelete />
+                    </div>
+                  </div>
+                </article>
+              );
+            })
+          )
         ) : (
           <h2>Vehicle model list is empty!</h2>
         )}
@@ -206,15 +246,34 @@ const Wrapper = styled.section`
     border-radius: 5px;
     color: var(--color-btn-t);
     font-size: 0.8rem;
-    position: absolute;
-    top: 5.5%;
-    right: 30%;
     display: flex;
     align-items: center;
     gap: 0.4rem;
+    margin: 0 0 0 auto;
+    transition: all 0.3s;
+    &:hover {
+      color: var(--color-img-sec);
+    }
     & svg {
       z-index: 4;
     }
+  }
+  .params {
+    & h2 {
+      margin: 0;
+    }
+  }
+  @media (max-width: 600px) {
+    .car-makers {
+      display: flex;
+      flex-direction: column;
+    }
+  }
+  .params {
+    flex-direction: column;
+  }
+  .link-to {
+    margin: 1.2rem auto 0 0;
   }
 `;
 

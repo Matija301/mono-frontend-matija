@@ -45,7 +45,7 @@ const Wrapper = styled.aside`
     grid-template-columns: 1fr;
     justify-items: center;
     align-items: center;
-    background: var(--color-btn);
+    background: var(--color-body);
     padding: 1.2rem 2.4rem;
     border-radius: 15px;
     gap: 0.8rem;
@@ -70,9 +70,18 @@ const Wrapper = styled.aside`
     padding: 0.4rem 1.2rem;
     appearance: none;
     border: none;
-    background: var(--color-img-tert);
+    background: var(--color-btn);
     border-radius: 5px;
     cursor: pointer;
+  }
+
+  @media (max-width: 860px) {
+    .sticky {
+      left: 0%;
+      top: 40%;
+      width: 100%;
+      padding: 2.4rem 1.2rem;
+    }
   }
 `;
 

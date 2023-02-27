@@ -4,12 +4,12 @@ import styled from "styled-components";
 import store from "../Stores/todoStore";
 import { AiFillCaretLeft, AiFillCaretRight } from "react-icons/ai";
 import Loading from "./Loading";
-import { useLocation } from "react-router";
+import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 const MakeVehicleList = () => {
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate();
   function pageInc() {
     if (page === store.filteredMakerList.length - 1) {
       return;
@@ -25,15 +25,22 @@ const MakeVehicleList = () => {
     }
   }
   async function getData() {
-    setLoading(true);
-    await store.setLists();
-    store.resetFilter();
-    store.filterListMaker();
-    setLoading(false);
+    try {
+      setLoading(true);
+      await store.setLists();
+      store.resetFilter();
+      store.filterListMaker();
+      setLoading(false);
+    } catch (error) {
+      navigate("../../");
+    }
   }
   useEffect(() => {
     getData();
   }, []);
+  useEffect(() => {
+    setPage(0);
+  }, [store.filteredOptionMaker]);
 
   if (loading) {
     return <Loading />;
@@ -46,23 +53,41 @@ const MakeVehicleList = () => {
       {store.filteredMakerList.length > 0 ? (
         <>
           <div className="maker-list">
-            {store.filteredMakerList[page].map((item) => {
-              const { id, vehicleMakeAbrv, vehicleMakeName } = item;
-              return (
-                <article key={id} className="car-makers">
-                  <h3>Car maker: </h3>
-                  <p>{vehicleMakeName}</p>
-                  <h3>Also known as:</h3>
-                  <p>{vehicleMakeAbrv}</p>
-                  <Link
-                    className="link-list"
-                    to={`../../vehicleMakerList/${vehicleMakeName}`}
-                  >
-                    List models
-                  </Link>
-                </article>
-              );
-            })}
+            {store.filteredMakerList[page]
+              ? store.filteredMakerList[page].map((item) => {
+                  const { id, vehicleMakeAbrv, vehicleMakeName } = item;
+                  return (
+                    <article key={id} className="car-makers">
+                      <h3>Car maker: </h3>
+                      <p>{vehicleMakeName}</p>
+                      <h3>Also known as:</h3>
+                      <p>{vehicleMakeAbrv}</p>
+                      <Link
+                        className="link-list"
+                        to={`../../vehicleMakerList/${vehicleMakeName}`}
+                      >
+                        List models
+                      </Link>
+                    </article>
+                  );
+                })
+              : store.filteredMakerList[0].map((item) => {
+                  const { id, vehicleMakeAbrv, vehicleMakeName } = item;
+                  return (
+                    <article key={id} className="car-makers">
+                      <h3>Car maker: </h3>
+                      <p>{vehicleMakeName}</p>
+                      <h3>Also known as:</h3>
+                      <p>{vehicleMakeAbrv}</p>
+                      <Link
+                        className="link-list"
+                        to={`../../vehicleMakerList/${vehicleMakeName}`}
+                      >
+                        List models
+                      </Link>
+                    </article>
+                  );
+                })}
           </div>
           {store.filteredMakerList.length > 0 ? (
             <div className="list-pages">
@@ -114,6 +139,10 @@ const Wrapper = styled.section`
     border: none;
     border-radius: 15px;
     color: var(--color-btn-t);
+    transition: all 0.3s;
+    &:hover {
+      color: var(--color-img-sec);
+    }
   }
   .maker-list {
     display: grid;
@@ -151,7 +180,12 @@ const Wrapper = styled.section`
       margin: 0;
     }
   }
-  @media (max-width: 800px) {
+  @media (max-width: 1000px) {
+    .car-makers {
+      padding: 0.8rem 2.4rem;
+    }
+  }
+  @media (max-width: 860px) {
     .maker-list {
       grid-template-columns: 1fr;
     }

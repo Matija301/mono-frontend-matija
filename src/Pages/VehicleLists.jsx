@@ -1,11 +1,10 @@
-import { runInAction } from "mobx";
 import { observer } from "mobx-react-lite";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Outlet } from "react-router";
 import styled from "styled-components";
-import Filter from "./Filter";
+import Filter from "../Components/Filter";
 
-const VehicleMake = () => {
+const VehicleLists = () => {
   return (
     <Wrapper>
       <Filter></Filter>
@@ -17,6 +16,9 @@ const VehicleMake = () => {
 const Wrapper = styled.main`
   display: grid;
   grid-template-columns: 20rem 1fr;
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
-export default observer(VehicleMake);
+export default observer(VehicleLists);

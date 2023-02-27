@@ -1,8 +1,17 @@
 import Airtable from "airtable";
-import { makeAutoObservable, runInAction } from "mobx";
+import { makeAutoObservable } from "mobx";
 import filterSortList from "../Common/filterList";
 import filterSortListMaker from "../Common/filterListMaker";
 import paginate from "../Common/pagination";
+
+function getLocalData() {
+  const data = localStorage.getItem("API_KEY");
+  if (!data) {
+    return "keyMissing";
+  }
+  return data;
+}
+
 class Todo {
   vehicleMake = [];
   vehicleModel = [];
@@ -11,6 +20,8 @@ class Todo {
   filteredMakerList = [];
   vehicleMakeIdList = [];
   vehicleModelEdit = {};
+  setKeyAction = "";
+  openSidebar = false;
   vehicleModelSubmiting = false;
   vehicleModelError = false;
   vehicleModelEdit = "";
@@ -28,7 +39,40 @@ class Todo {
 
   constructor() {
     makeAutoObservable(this);
-    this.base = new Airtable({ apiKey: "" }).base("applZg79OWIt6P0Vh");
+    this.apiKey = getLocalData();
+    this.base = new Airtable({ apiKey: this.apiKey }).base("applZg79OWIt6P0Vh");
+  }
+
+  async setApiKey(key) {
+    if (key.trim() === "") {
+      return;
+    }
+    this.apiKey = key;
+    localStorage.setItem("API_KEY", key);
+
+    try {
+      const data = new Airtable({ apiKey: this.apiKey }).base(
+        "applZg79OWIt6P0Vh"
+      );
+      await data("carlistDB").select().all();
+      this.setKeyAction = "API key is valid!";
+    } catch (error) {
+      this.setKeyAction = error.message;
+    }
+    setTimeout(() => window.location.reload(), 2000);
+  }
+  deleteApiKey() {
+    this.apiKey = "";
+    localStorage.setItem("API_KEY", "");
+    setTimeout(() => window.location.reload(), 2000);
+  }
+
+  setOpensidebar() {
+    if (this.openSidebar) {
+      this.openSidebar = false;
+    } else {
+      this.openSidebar = true;
+    }
   }
 
   async setSubmitModel(item) {
@@ -37,10 +81,11 @@ class Todo {
     try {
       await this.base("carlistDB").create(item);
       this.vehicleModelSubmiting = true;
+      this.vehicleModelError = "success";
     } catch (error) {
       console.log(error);
       this.vehicleModelSubmiting = true;
-      this.vehicleModelError = true;
+      this.vehicleModelError = "error";
     }
   }
 

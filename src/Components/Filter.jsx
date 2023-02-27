@@ -192,6 +192,9 @@ const Wrapper = styled.aside`
     width: 50%;
     text-overflow: ellipsis;
   }
+  @media (max-width: 860px) {
+    max-width: 40rem;
+  }
 `;
 
 export default observer(FIlter);

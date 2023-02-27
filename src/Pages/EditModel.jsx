@@ -31,7 +31,6 @@ const EditModel = () => {
 
   async function submitData(e) {
     e.preventDefault();
-    debugger;
     if (
       modelName.trim() !== "" &&
       modelAbrv.trim() !== "" &&
@@ -39,7 +38,6 @@ const EditModel = () => {
       makerName.trim() !== "" &&
       makerAbrv.trim() !== ""
     ) {
-      debugger;
       const newModel = [
         {
           id: itemId,
@@ -74,7 +72,7 @@ const EditModel = () => {
     <Wrapper>
       <div className="header-link">
         <h2>Edit vehicle model</h2>
-        <Link className="link-to" to="../../carlist/carMakers">
+        <Link className="link-to" to="../../carlist/carModels">
           Go back to vehicle models! {<AiOutlineArrowRight />}
         </Link>
       </div>
@@ -270,6 +268,16 @@ const Wrapper = styled.main`
     border: none;
     justify-self: center;
     margin-top: 1.8rem;
+    transition: all 0.3s;
+    &:hover {
+      color: var(--color-img-sec);
+    }
+  }
+  @media (max-width: 680px) {
+    .header-link {
+      flex-direction: column;
+      gap: 0;
+    }
   }
 `;
 

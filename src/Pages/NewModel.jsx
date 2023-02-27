@@ -1,6 +1,7 @@
 import { observer } from "mobx-react-lite";
 import React, { useEffect, useState } from "react";
-import styled, { keyframes } from "styled-components";
+import { useNavigate } from "react-router";
+import styled from "styled-components";
 import Loading from "../Components/Loading";
 import store from "../Stores/todoStore";
 
@@ -12,12 +13,17 @@ const NewModel = () => {
   const [makerId, setMakerId] = useState("");
   const [makerName, setMakerName] = useState("");
   const [makerAbrv, setMakerAbrv] = useState("");
-
+  const navigate = useNavigate();
+  const navigateBack = useNavigate();
   async function getData() {
-    setLoading(true);
-    await store.setLists();
-    setSelected(store.vehicleMakeOptons[0]);
-    setLoading(false);
+    try {
+      setLoading(true);
+      await store.setLists();
+      setSelected(store.vehicleMakeOptons[0]);
+      setLoading(false);
+    } catch (error) {
+      navigate("../../");
+    }
   }
 
   function submitData(e) {
@@ -44,6 +50,12 @@ const NewModel = () => {
       store.setSubmitModel(newModel);
       setModelName("");
       setModelAbrv("");
+      setMakerId("");
+      setMakerName("");
+      setMakerAbrv("");
+      setTimeout(() => {
+        navigateBack("../");
+      }, 2000);
     }
   }
 
@@ -88,8 +100,10 @@ const NewModel = () => {
   return (
     <Wrapper>
       <h2>Create new vehicle model</h2>
-      {store.vehicleModelError === true ? (
-        <div className="error">There is error in posting data to server</div>
+      {store.vehicleModelError === "error" ? (
+        <div className="msg">There is error in posting data to server</div>
+      ) : store.vehicleModelError === "success" ? (
+        <div className="msg">Successfully created new vehicle model!</div>
       ) : (
         ""
       )}
@@ -284,6 +298,14 @@ const Wrapper = styled.main`
     border: none;
     justify-self: center;
     margin-top: 1.8rem;
+    transition: all 0.3s;
+    &:hover {
+      color: var(--color-img-sec);
+    }
+  }
+  .msg {
+    font-size: 0.8rem;
+    text-transform: uppercase;
   }
 `;
 
